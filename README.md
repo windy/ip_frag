@@ -1,24 +1,17 @@
 # IpFrag
 
-TODO: Write a gem description
+Help you quickly create fragged packets, used by network test.
+
 
 ## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'ip_frag'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
 
     $ gem install ip_frag
 
 ## Usage
 
-TODO: Write usage instructions here
+    $ ip_gen --size 200 --mtu 1480
+    
+It will generate **2** UDP packets fragged.
 
 ## Contributing
 
