@@ -1,0 +1,29 @@
+$LOAD_PATH.unshift File.join( File.dirname(__FILE__), '..', 'lib')
+require 'ip_frag'
+require 'optparse'
+
+options = {
+  :mtu => 1480
+}
+
+OptionParser.new do |opts|
+  opts.on('-s size', '--size size', 'total size, should be bigger than mtu') do |v|
+    options[:size] = v.to_i
+  end
+  
+  opts.on('-m mtu', '--mtu mtu', 'ip mtu, offen less than 1480') do |v|
+    options[:mtu] = v.to_i
+  end
+  
+  opts.on('-h', '--help', 'Show this help and exit') do
+    puts opts
+    exit 0
+  end
+end.parse!
+
+if options[:size].nil?
+  $stderr.puts "less -s argument, please see help for more."
+  exit 1
+end
+
+IPFrag::Generator.new( options[:size], options[:mtu] ).write_dat
