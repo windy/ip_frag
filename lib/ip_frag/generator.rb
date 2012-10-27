@@ -10,15 +10,16 @@ module IPFrag
       ret = []
       
       offset = 0
-      ret << make_ip_packet(@mtu) do |p|
+      ret << make_ip_packet(packet_offset) do |p|
         p.offset = make_offset(offset)
       end
+      offset += packet_offset
       
       (packet_count - 2).times do
-        offset += @mtu
-        ret << make_ip_packet(@mtu) do |p|
+        ret << make_ip_packet(packet_offset) do |p|
           p.offset = make_offset(offset)
         end
+        offset += packet_offset
       end
       
       ret << make_ip_packet(packet_left) do |p|
@@ -33,6 +34,7 @@ module IPFrag
       ip_packets.map do |ip_packet|
         make_ether_packet do |e|
           e.payload = ip_packet
+          e.type
         end
       end
     end
@@ -50,37 +52,46 @@ module IPFrag
     # 
     #
     def packet_count
-      count, left = @size.divmod(@mtu)
+      count, left = @size.divmod(packet_offset)
       if left != 0
         count += 1
       end
       count
     end
     
+    def packet_offset
+      @mtu & (~7)
+    end
+    
     def packet_left
-      left = @size % @mtu
-      left = @mtu if left == 0
+      left = @size % packet_offset
+      left = packet_offset if left == 0
       left
     end
     
     def make_ip_packet(size)
       ip = Mu::Pcap::IPv4.new(src_ip, dst_ip)
       ip.payload = contant(size)
+      ip.proto = Mu::Pcap::IP::IPPROTO_UDP
       yield ip if block_given?
       ip
     end
     
     def make_ether_packet
       packet = Mu::Pcap::Ethernet.new(src_mac, dst_mac)
+      packet.type = Mu::Pcap::Ethernet::ETHERTYPE_IP
       yield packet
       packet
     end
     
     def make_offset(offset, last = false)
-      if offset & (~ 0x07 << 13) != 0x0
-        raise "too big offset"
+      offset = offset >> 3
+      
+      flag = 1
+      if last
+        flag = 0
       end
-      (1 << 13) & offset
+      ( flag << 13) | offset
     end
     
     def check_size_mtu

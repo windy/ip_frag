@@ -13,13 +13,13 @@ describe IPFrag do
   end
   
   it "#split" do
-    g = IPFrag::Generator.new(100, 10)
-    g.split_to_ip_packet.size.should == 10
-    g.split_to_ethernet_packet.size.should == 10
+    g = IPFrag::Generator.new(100, 8)
+    g.split_to_ip_packet.size.should == 13
+    g.split_to_ethernet_packet.size.should == 13
   end
   
   it "#write_dat" do
-    g = IPFrag::Generator.new(100, 10)
+    g = IPFrag::Generator.new(2000, 1460)
     g.write_dat('helper')
   end
 end
