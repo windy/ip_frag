@@ -42,7 +42,7 @@ module IPFrag
     def write_dat(path = '.')
       split_to_ethernet_packet.each_with_index do |p, i|
         file_name = "#{i+1}.dat"
-        file = File.open( File.join(path, file_name), 'w') do |f|
+        file = File.open( File.join(path, file_name), 'wb') do |f|
           p.write(f)
         end
       end
