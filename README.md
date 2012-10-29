@@ -9,7 +9,7 @@ Help you quickly create fragged packets, used by network test.
 
 ## Usage
 
-    $ ip_gen --size 200 --mtu 1480
+    $ ip_gen --size 2000 --mtu 1480
     
 It will generate **2** UDP packets fragged.
 

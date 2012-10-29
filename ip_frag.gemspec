@@ -14,5 +14,5 @@ Gem::Specification.new do |gem|
   gem.name          = "ip_frag"
   gem.require_paths = ["lib"]
   gem.version       = IPFrag::VERSION
-  gem.add_dependency "diy-pcap", ">= 0.3.7"
+  gem.add_dependency "DIY-pcap", ">= 0.3.7"
 end
