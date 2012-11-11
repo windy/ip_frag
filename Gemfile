@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
 
-gem 'DIY-pcap', ">=0.3.7", :require => "diy-pcap"
+gemspec
 gem 'rake'
 gem 'rspec'
