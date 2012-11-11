@@ -1,3 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'ip_frag'
+gem 'DIY-pcap', ">=0.3.7"
+gem 'rake'
