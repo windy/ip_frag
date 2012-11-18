@@ -1,3 +1,3 @@
 require "ip_frag/version"
-require 'diy-pcap'
+require 'DIY-pcap'
 require 'ip_frag/generator'
