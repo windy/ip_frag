@@ -14,7 +14,7 @@ describe IPFrag do
   end
   
   it "#split" do
-    g = IPFrag::Generator.new(100, 8)
+    g = IPFrag::Generator.new(1000, 80)
     g.split_to_ip_packet.size.should == 13
     g.split_to_ethernet_packet.size.should == 13
   end
@@ -26,4 +26,18 @@ describe IPFrag do
     Dir["tmp/*"].size.should == 2
     FileUtils.rm_rf('tmp')
   end
+  
+  it "#65535 split" do
+    g = IPFrag::Generator.new(65535, 696)
+    g.split_to_ip_packet.size.should == 95
+    g.split_to_ethernet_packet.size.should == 95
+  end
+  
+  it "#contant" do
+    g = IPFrag::Generator.new(2000, 1500)
+    ip = mock
+    ip.stub(:pseudo_header).and_return("123")
+    g.contant(g.udp_size_from(1000), ip).size.should == g.udp_size_from(1000) + 8
+  end
+  
 end

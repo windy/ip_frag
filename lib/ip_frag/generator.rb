@@ -8,22 +8,25 @@ module IPFrag
     
     def split_to_ip_packet
       ret = []
-      
+
       offset = 0
       ret << make_ip_packet(packet_offset) do |p|
         p.offset = make_offset(offset)
+        p.payload = udp_offset( contant(udp_size_from(@size), p), 1)
       end
       offset += packet_offset
       
-      (packet_count - 2).times do
+      (packet_count - 2).times do |i|
         ret << make_ip_packet(packet_offset) do |p|
           p.offset = make_offset(offset)
+          p.payload = udp_offset( contant(udp_size_from(@size), p), i+2)
         end
         offset += packet_offset
       end
       
       ret << make_ip_packet(packet_left) do |p|
         p.offset = make_offset(offset, true)
+        p.payload = udp_offset( contant(udp_size_from(@size), p), packet_count)
       end
       
       ret
@@ -71,7 +74,6 @@ module IPFrag
     
     def make_ip_packet(size)
       ip = Mu::Pcap::IPv4.new(src_ip, dst_ip)
-      ip.payload = contant(size)
       ip.proto = Mu::Pcap::IP::IPPROTO_UDP
       yield ip if block_given?
       ip
@@ -97,7 +99,7 @@ module IPFrag
     def check_size_mtu
       
       if @size <= @mtu
-        raise "Size#{@size} MUST be big than Mtu#{@mtu}."
+        raise "Size #{@size} MUST be big than Mtu #{@mtu}."
       end
       
       if @mtu <= 0
@@ -121,10 +123,36 @@ module IPFrag
       @dst_mac ||= '00:00:00:00:00:02'
     end
     
-    attr_writer :src_ip, :dst_ip, :src_mac, :dst_mac
+    def src_port
+      @src_port ||= 1000
+    end
     
-    def contant(size)
-      'a' * size
+    def dst_port
+      @dst_port ||= 2000
+    end
+    
+    
+    attr_writer :src_ip, :dst_ip, :src_mac, :dst_mac, :src_port, :dst_port
+    
+    def udp_offset( udp, packet_num)
+      size = @mtu
+      udp[(packet_num-1)*size..packet_num*size -1 ]
+    end
+    
+    def udp_size_from(ip_size)
+      ip_size - 8
+    end
+    
+    
+    # 生成特定长度的 UDP 报文
+    def contant(size, ip)
+      return @udp_packet if @udp_packet
+      udp = Mu::Pcap::UDP.new(src_port, dst_port)
+      udp.payload = 'a' * size
+      udp_packet_str = StringIO.new
+      udp.write(udp_packet_str, ip)
+      udp_packet_str.rewind
+      @udp_packet ||= udp_packet_str.read
     end
   end
   
