@@ -12,21 +12,21 @@ module IPFrag
       offset = 0
       ret << make_ip_packet(packet_offset) do |p|
         p.offset = make_offset(offset)
-        p.payload = udp_offset( contant(udp_size_from(@size), p), 1)
+        p.payload = udp_offset( contant(udp_size_from(@size), p), offset, packet_offset)
       end
       offset += packet_offset
       
       (packet_count - 2).times do |i|
         ret << make_ip_packet(packet_offset) do |p|
           p.offset = make_offset(offset)
-          p.payload = udp_offset( contant(udp_size_from(@size), p), i+2)
+          p.payload = udp_offset( contant(udp_size_from(@size), p), offset, packet_offset)
         end
         offset += packet_offset
       end
       
       ret << make_ip_packet(packet_left) do |p|
         p.offset = make_offset(offset, true)
-        p.payload = udp_offset( contant(udp_size_from(@size), p), packet_count)
+        p.payload = udp_offset( contant(udp_size_from(@size), p), offset, packet_left)
       end
       
       ret
@@ -134,9 +134,8 @@ module IPFrag
     
     attr_writer :src_ip, :dst_ip, :src_mac, :dst_mac, :src_port, :dst_port
     
-    def udp_offset( udp, packet_num)
-      size = @mtu
-      udp[(packet_num-1)*size..packet_num*size -1 ]
+    def udp_offset( udp, start, endt)
+      udp[start..(start + endt-1)]
     end
     
     def udp_size_from(ip_size)

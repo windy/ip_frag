@@ -21,9 +21,18 @@ describe IPFrag do
   
   it "#write_dat" do
     g = IPFrag::Generator.new(2000, 1460)
+    FileUtils.rm_rf('tmp')
     FileUtils.mkdir('tmp') rescue nil
     g.write_dat('tmp')
     Dir["tmp/*"].size.should == 2
+    
+  end
+
+  it "#write_dat2" do
+    g = IPFrag::Generator.new(60000, 700)
+    FileUtils.mkdir('tmp') rescue nil
+    g.write_dat('tmp')
+    Dir["tmp/*"].size.should == 87
     FileUtils.rm_rf('tmp')
   end
   
